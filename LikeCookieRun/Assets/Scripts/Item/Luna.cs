@@ -1,11 +1,16 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 
 class Luna : ItemBase {
-    private void OnTriggerEnter2D(Collider2D collision) {
+    private float _score = 500;
+    private float _heal = 5; 
+
+    protected override void OnTriggerEnter2D(Collider2D collision) {
         if (IsPlayer(collision)) {
             base.OnTriggerEnter2D(collision);
 
-            // 달은 뭐할까???
+            GameManager.Instance.AddScore(_score);
+            GameManager.Instance.AddEnergy(_heal);
         }
     }
 }

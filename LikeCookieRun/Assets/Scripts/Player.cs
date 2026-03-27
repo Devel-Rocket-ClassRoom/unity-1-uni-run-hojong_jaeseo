@@ -14,6 +14,7 @@ public class Player : MonoBehaviour
 
     private bool _isSliding = false;
     private bool _isJumping = false;
+    private bool _isDead = false;
 
     private int _jumpCount = 0;
 
@@ -30,30 +31,37 @@ public class Player : MonoBehaviour
     }
 
     private void Update() {
-        // 점프
-        if (Input.GetKeyDown(KeyCode.Space) && _jumpCount < 2) { 
-            EndSlide();
-            StartJump();
+
+        if (!GameManager.Instance.IsGameOver) {
+            // 점프
+            if (Input.GetKeyDown(KeyCode.Space) && _jumpCount < 2) { 
+                EndSlide();
+                StartJump();
+            }
+
+            // 슬라이딩
+            if ((Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftControl) && !_isJumping)) { StartSlide(); } 
+            else if (Input.GetKeyUp(KeyCode.LeftControl) && _isSliding) { EndSlide(); }
+
+            // 애니메이션 동기화
+            _animator.SetInteger(PlayerAnimation.JumpCount, _jumpCount);
+            _animator.SetBool(PlayerAnimation.IsJumping, _isJumping);
+            _animator.SetBool(PlayerAnimation.IsSliding, _isSliding);
+
+            // 떨어지면 다시 위에서 나오게
+            if (transform.position.y <= -(Camera.ScreenHeight * 0.5)) {
+                transform.position = new Vector3(transform.position.x, Camera.ScreenHeight * 0.7f, 0);
+            }
+
+            // 뒤로 밀리면 다시 제자리로
+            if (transform.position.x <= _initialXLoc) {
+                transform.position += Vector3.right * _xRecoverSpeed * Time.deltaTime;
+            }
+        } else if (!_isDead){
+            _isDead = true;
+            _animator.SetTrigger(PlayerAnimation.Dead);
         }
-
-        // 슬라이딩
-        if ((Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftControl) && !_isJumping)) { StartSlide(); } 
-        else if (Input.GetKeyUp(KeyCode.LeftControl) && _isSliding) { EndSlide(); }
-
-        // 애니메이션 동기화
-        _animator.SetInteger(PlayerAnimation.JumpCount, _jumpCount);
-        _animator.SetBool(PlayerAnimation.IsJumping, _isJumping);
-        _animator.SetBool(PlayerAnimation.IsSliding, _isSliding);
-
-        // 떨어지면 다시 위에서 나오게
-        if (transform.position.y <= -(Camera.ScreenHeight * 0.5)) {
-            transform.position = new Vector3(transform.position.x, Camera.ScreenHeight * 0.7f, 0);
-        }
-
-        // 뒤로 밀리면 다시 제자리로
-        if (transform.position.x <= _initialXLoc) {
-            transform.position += Vector3.right * _xRecoverSpeed * Time.deltaTime;
-        }
+        
     }
     
     private void OnTriggerEnter2D(Collider2D collision) {
@@ -63,7 +71,7 @@ public class Player : MonoBehaviour
         }
 
         if (collision.CompareTag(Tags.Hit)) {
-            // 체력 깎는 로직
+            GameManager.Instance.ReduceEnergy(GameManager.Instance.HitEnergyReduce);
         }
     }
 
