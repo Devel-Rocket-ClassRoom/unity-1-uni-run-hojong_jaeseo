@@ -9,6 +9,9 @@ public class Player : MonoBehaviour
     [SerializeField]
     private float _jumpPower = 5f;
 
+    private float _initialXLoc;
+    private float _xRecoverSpeed = 3f;
+
     private bool _isSliding = false;
     private bool _isJumping = false;
 
@@ -17,13 +20,13 @@ public class Player : MonoBehaviour
     private Animator _animator;
     private Rigidbody2D _rigidBody;
     private BoxCollider2D _boxColider;
-    private CircleCollider2D _circleColider;
 
     private void Awake() {
         _animator = GetComponent<Animator>();
         _rigidBody = GetComponent<Rigidbody2D>();
         _boxColider = GetComponent<BoxCollider2D>();
-        _circleColider = GetComponent<CircleCollider2D>();
+
+        _initialXLoc = transform.position.x;
     }
 
     private void Update() {
@@ -33,20 +36,34 @@ public class Player : MonoBehaviour
             StartJump();
         }
 
-
         // 슬라이딩
-        if (Input.GetKeyDown(KeyCode.LeftControl) && !_isJumping) { StartSlide(); } 
+        if ((Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKey(KeyCode.LeftControl) && !_isJumping)) { StartSlide(); } 
         else if (Input.GetKeyUp(KeyCode.LeftControl) && _isSliding) { EndSlide(); }
 
+        // 애니메이션 동기화
         _animator.SetInteger(PlayerAnimation.JumpCount, _jumpCount);
         _animator.SetBool(PlayerAnimation.IsJumping, _isJumping);
         _animator.SetBool(PlayerAnimation.IsSliding, _isSliding);
+
+        // 떨어지면 다시 위에서 나오게
+        if (transform.position.y <= -(Camera.ScreenHeight * 0.5)) {
+            transform.position = new Vector3(transform.position.x, Camera.ScreenHeight * 0.7f, 0);
+        }
+
+        // 뒤로 밀리면 다시 제자리로
+        if (transform.position.x <= _initialXLoc) {
+            transform.position += Vector3.right * _xRecoverSpeed * Time.deltaTime;
+        }
     }
     
     private void OnTriggerEnter2D(Collider2D collision) {
         // 점프 종료
         if (collision.CompareTag(Tags.Ground)) {
             EndJump();
+        }
+
+        if (collision.CompareTag(Tags.Hit)) {
+            // 체력 깎는 로직
         }
     }
 
@@ -70,7 +87,6 @@ public class Player : MonoBehaviour
 
         _isJumping = true;
     }
-
     private void EndJump() {
         _isJumping = false;
         _jumpCount = 0;
