@@ -10,7 +10,7 @@ class Luna : ItemBase {
             base.OnTriggerEnter2D(collision);
 
             GameManager.Instance.AddScore(_score);
-            GameManager.Instance.AddEnergy(_heal);
+            GameManager.Instance.AddHealth(_heal);
         }
     }
 }

@@ -71,7 +71,7 @@ public class Player : MonoBehaviour
         }
 
         if (collision.CompareTag(Tags.Hit)) {
-            GameManager.Instance.ReduceEnergy(GameManager.Instance.HitEnergyReduce);
+            GameManager.Instance.ReduceHealth(GameManager.Instance.HitEnergyReduce);
         }
     }
 
