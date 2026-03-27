@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public abstract class ItemBase : MonoBehaviour
@@ -9,4 +10,5 @@ public abstract class ItemBase : MonoBehaviour
     protected bool IsPlayer(Collider2D collision) {
         return collision.CompareTag(Tags.Player);
     }
+
 }

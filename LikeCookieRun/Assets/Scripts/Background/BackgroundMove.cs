@@ -8,6 +8,8 @@ public class BackgroundMove : MonoBehaviour
 
     private void Update()
     {
-        transform.position += Vector3.left * _speed * Time.deltaTime;
+        if (!GameManager.Instance.IsGameOver) {
+            transform.position += Vector3.left * _speed * Time.deltaTime;
+        }
     }
 }
