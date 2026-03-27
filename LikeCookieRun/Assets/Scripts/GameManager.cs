@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,13 +8,24 @@ public class GameManager : MonoBehaviour
     private static GameManager instance;
     public static GameManager Instance => instance ?? FindFirstObjectByType<GameManager>();
 
-    public float Energy { get; private set; } = 100f;
-    public float Score { get; private set; } = 0f;
+    private float _maxHealth = 100;
+    public float Health { get; private set; }
+    public float Score { get; private set; }
     public readonly float HitEnergyReduce = 20.0f;
-    public bool IsGameOver => Energy <= 0f;
+    public bool IsGameOver => Health <= 0f;
 
     [SerializeField]
     private float _energyReduceSpeed = 2f;
+
+    [SerializeField]
+    private TextMeshProUGUI _healthBarText;
+    [SerializeField]
+    private TextMeshProUGUI _scoreText;
+
+    private void Awake() {
+        Health = _maxHealth;
+        Score = 0;
+    }
 
     private void Update() {
         if (IsGameOver) {
@@ -30,26 +42,29 @@ public class GameManager : MonoBehaviour
             Application.Quit();
         }
 
-        Energy -= _energyReduceSpeed * Time.deltaTime;
+        Health -= _energyReduceSpeed * Time.deltaTime;
+
+        _healthBarText.text = new string('|', (int)(Health / _maxHealth * 75f));
     }
 
     public void AddScore(float score) {
         Score += score;
 
+        _scoreText.text = $"Score : {Score}";
         Debug.Log(Score);
     }
 
-    public void AddEnergy(float energy) {
-        Energy += energy;
+    public void AddHealth(float energy) {
+        Health += energy;
 
-        Energy = Mathf.Min(Energy, 100f);
+        Health = Mathf.Min(Health, 100f);
 
-        Debug.Log(Energy);
+        Debug.Log(Health);
     }
 
-    public void ReduceEnergy(float energy) {
-        Energy -= energy;
+    public void ReduceHealth(float energy) {
+        Health -= energy;
 
-        Debug.Log(Energy);
+        Debug.Log(Health);
     }
 }

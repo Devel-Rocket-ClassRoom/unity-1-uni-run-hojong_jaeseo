@@ -9,7 +9,7 @@ public class Health : ItemBase
             base.OnTriggerEnter2D(collision);
 
             // 체력 증가
-            GameManager.Instance.AddEnergy(_heal);
+            GameManager.Instance.AddHealth(_heal);
         }
     }
 }
