@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance => instance ?? FindFirstObjectByType<GameManager>();
 
     private float _maxHealth = 100;
+    private int _maxHealthBarLength = 86;
     public float Health { get; private set; }
     public float Score { get; private set; }
     public readonly float HitEnergyReduce = 20.0f;
@@ -32,6 +33,8 @@ public class GameManager : MonoBehaviour
     }
 
     private void Update() {
+        _healthBarText.text = new string('|', Math.Max((int)(Health / _maxHealth * _maxHealthBarLength), 0));
+
         if (IsGameOver) {
             _gameOverText.gameObject.SetActive(true);
 
@@ -47,13 +50,12 @@ public class GameManager : MonoBehaviour
         }
 
         Health -= _energyReduceSpeed * Time.deltaTime;
-        _healthBarText.text = new string('|', (int)(Health / _maxHealth * 75f));
     }
 
     public void AddScore(float score) {
         Score += score;
 
-        _scoreText.text = $"{Score}";
+        _scoreText.text = $"{Score:N0}";
         Debug.Log(Score);
     }
 
