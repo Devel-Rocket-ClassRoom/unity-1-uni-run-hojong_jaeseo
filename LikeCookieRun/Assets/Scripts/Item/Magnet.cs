@@ -1,15 +1,12 @@
 using UnityEngine;
 
-public class Health : ItemBase
+public class Magnet : ItemBase
 {
-    private float _heal = 30;
-
     protected override void OnTriggerEnter2D(Collider2D collision) {
         base.OnTriggerEnter2D(collision);
-
         if (IsPlayer(collision)) {
-            // 체력 증가
-            GameManager.Instance.AddHealth(_heal);
+            // 자석 아이템 활성화
+            collision.gameObject.GetComponent<Player>().ActivateMagnet();
         }
     }
 }
