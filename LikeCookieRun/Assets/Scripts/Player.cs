@@ -18,10 +18,17 @@ public class Player : MonoBehaviour
 
     private int _jumpCount = 0;
 
-    // 맞으면 2초간 무적
+    // 충돌 후 무적 시간 관리
     private float _lastHitTime;
     private float _noDamageDuration = 2f;
     private bool _isNoDamageState = true;
+
+    // 자석 아이템 관리
+    [SerializeField]
+    private GameObject _magnetArea;
+    private float _magnetStartTime = -10f;
+    private float _magnetDuration = 5f;
+    private bool _isMagnetActive => _magnetArea.GetComponent<BoxCollider2D>().enabled;
 
     private Animator _animator;
     private Rigidbody2D _rigidBody;
@@ -35,6 +42,7 @@ public class Player : MonoBehaviour
         _renderer = GetComponent<SpriteRenderer>();
 
         _initialXLoc = transform.position.x;
+        _magnetArea.GetComponent<BoxCollider2D>().enabled = false;
     }
 
     private void Update() {
@@ -71,6 +79,11 @@ public class Player : MonoBehaviour
             // 시간 지나면 해제
             else if (_isNoDamageState) {
                 DeactivateHit();
+            }
+
+            // 자석 아이템 시간 종료되면 해제
+            if (Time.time > _magnetStartTime + _magnetDuration && _isMagnetActive) {
+                _magnetArea.GetComponent<BoxCollider2D>().enabled = false;
             }
 
         } else if (!_isDead){
@@ -111,6 +124,12 @@ public class Player : MonoBehaviour
         GameManager.Instance.DeactivateSafeZone();
         // 모습 다시 보이게
         _renderer.enabled = true;
+    }
+
+    // 자석 아이템 활성화
+    public void ActivateMagnet() {
+        _magnetStartTime = Time.time;
+        _magnetArea.GetComponent<BoxCollider2D>().enabled = true;
     }
 
     /// <summary>
