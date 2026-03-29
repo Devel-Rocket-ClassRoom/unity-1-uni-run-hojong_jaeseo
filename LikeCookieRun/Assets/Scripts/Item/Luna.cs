@@ -3,7 +3,7 @@ using UnityEngine;
 
 class Luna : ItemBase {
     private float _score = 500;
-    private float _heal = 5; 
+    private float _heal = 0;
 
     protected override void OnTriggerEnter2D(Collider2D collision) {
         if (IsPlayer(collision)) {

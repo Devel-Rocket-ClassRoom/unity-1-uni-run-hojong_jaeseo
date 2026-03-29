@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -21,15 +22,18 @@ public class GameManager : MonoBehaviour
     private TextMeshProUGUI _healthBarText;
     [SerializeField]
     private TextMeshProUGUI _scoreText;
+    [SerializeField]
+    private TextMeshProUGUI _gameOverText;
 
     private void Awake() {
         Health = _maxHealth;
         Score = 0;
+        _gameOverText.gameObject.SetActive(false);
     }
 
     private void Update() {
         if (IsGameOver) {
-            // GameOver UI 띄우기
+            _gameOverText.gameObject.SetActive(true);
 
             if (Input.GetKeyDown(KeyCode.R)) {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
@@ -43,14 +47,13 @@ public class GameManager : MonoBehaviour
         }
 
         Health -= _energyReduceSpeed * Time.deltaTime;
-
         _healthBarText.text = new string('|', (int)(Health / _maxHealth * 75f));
     }
 
     public void AddScore(float score) {
         Score += score;
 
-        _scoreText.text = $"Score : {Score}";
+        _scoreText.text = $"{Score}";
         Debug.Log(Score);
     }
 
