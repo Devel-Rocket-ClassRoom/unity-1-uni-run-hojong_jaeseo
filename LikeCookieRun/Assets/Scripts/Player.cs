@@ -18,20 +18,25 @@ public class Player : MonoBehaviour
 
     private int _jumpCount = 0;
 
+    // 맞으면 2초간 무적
+    private float _lastHitTime;
+    private float _noDamageDuration = 2f;
+
     private Animator _animator;
     private Rigidbody2D _rigidBody;
     private BoxCollider2D _boxColider;
+    private SpriteRenderer _renderer;
 
     private void Awake() {
         _animator = GetComponent<Animator>();
         _rigidBody = GetComponent<Rigidbody2D>();
         _boxColider = GetComponent<BoxCollider2D>();
+        _renderer = GetComponent<SpriteRenderer>();
 
         _initialXLoc = transform.position.x;
     }
 
     private void Update() {
-
         if (!GameManager.Instance.IsGameOver) {
             // 점프
             if (Input.GetKeyDown(KeyCode.Space) && _jumpCount < 2) { 
@@ -57,11 +62,15 @@ public class Player : MonoBehaviour
             if (transform.position.x <= _initialXLoc) {
                 transform.position += Vector3.right * _xRecoverSpeed * Time.deltaTime;
             }
+
+            // 맞은 지 얼마 안되었다면, 무적인 것 처럼 깜빡이기
+            if (Time.time - _lastHitTime < _noDamageDuration) { _renderer.enabled = !(_renderer.enabled); }
+            else { _renderer.enabled = true; }
+
         } else if (!_isDead){
             _isDead = true;
             _animator.SetTrigger(PlayerAnimation.Dead);
         }
-        
     }
     
     private void OnTriggerEnter2D(Collider2D collision) {
@@ -70,8 +79,9 @@ public class Player : MonoBehaviour
             EndJump();
         }
 
-        if (collision.CompareTag(Tags.Hit)) {
+        if (collision.CompareTag(Tags.Hit) && Time.time >= _lastHitTime + _noDamageDuration) {
             GameManager.Instance.ReduceHealth(GameManager.Instance.HitEnergyReduce);
+            _lastHitTime = Time.time;
         }
     }
 
