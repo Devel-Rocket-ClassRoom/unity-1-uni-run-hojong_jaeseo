@@ -18,20 +18,26 @@ public class Player : MonoBehaviour
 
     private int _jumpCount = 0;
 
+    // 맞으면 2초간 무적
+    private float _lastHitTime;
+    private float _noDamageDuration = 2f;
+    private bool _isNoDamageState = true;
+
     private Animator _animator;
     private Rigidbody2D _rigidBody;
     private BoxCollider2D _boxColider;
+    private SpriteRenderer _renderer;
 
     private void Awake() {
         _animator = GetComponent<Animator>();
         _rigidBody = GetComponent<Rigidbody2D>();
         _boxColider = GetComponent<BoxCollider2D>();
+        _renderer = GetComponent<SpriteRenderer>();
 
         _initialXLoc = transform.position.x;
     }
 
     private void Update() {
-
         if (!GameManager.Instance.IsGameOver) {
             // 점프
             if (Input.GetKeyDown(KeyCode.Space) && _jumpCount < 2) { 
@@ -57,11 +63,22 @@ public class Player : MonoBehaviour
             if (transform.position.x <= _initialXLoc) {
                 transform.position += Vector3.right * _xRecoverSpeed * Time.deltaTime;
             }
+
+            // 맞은 지 얼마 안되었다면, 무적인 것 처럼 깜빡이기
+            if (Time.time - _lastHitTime < _noDamageDuration) { 
+                _renderer.enabled = !(_renderer.enabled);
+            }
+            // 시간 지나면 해제
+            else if (_isNoDamageState) {
+                DeactivateHit();
+            }
+
         } else if (!_isDead){
             _isDead = true;
             _animator.SetTrigger(PlayerAnimation.Dead);
+            _rigidBody.linearVelocity = Vector3.zero;
+            _rigidBody.gravityScale = 0;
         }
-        
     }
     
     private void OnTriggerEnter2D(Collider2D collision) {
@@ -70,9 +87,30 @@ public class Player : MonoBehaviour
             EndJump();
         }
 
-        if (collision.CompareTag(Tags.Hit)) {
-            GameManager.Instance.ReduceHealth(GameManager.Instance.HitEnergyReduce);
+        // 맞았을 때
+        else if (collision.CompareTag(Tags.Hit) && Time.time >= _lastHitTime + _noDamageDuration) {
+            Hit();
         }
+    }
+
+    private void Hit() {
+        // 무적상태 활성화
+        _isNoDamageState = true;
+        // 체력 줄이기
+        GameManager.Instance.ReduceHealth(GameManager.Instance.HitEnergyReduce);
+        // 안전발판 활성화
+        GameManager.Instance.ActivateSafeZone();
+        // 충돌 시간 적용
+        _lastHitTime = Time.time;
+    }
+
+    private void DeactivateHit() {
+        // 무적 비활성화
+        _isNoDamageState = false;
+        // 안전발판 비활성화
+        GameManager.Instance.DeactivateSafeZone();
+        // 모습 다시 보이게
+        _renderer.enabled = true;
     }
 
     /// <summary>

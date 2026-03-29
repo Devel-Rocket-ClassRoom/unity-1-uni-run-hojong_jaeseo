@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,11 +25,16 @@ public class GameManager : MonoBehaviour
     private TextMeshProUGUI _scoreText;
     [SerializeField]
     private TextMeshProUGUI _gameOverText;
+    
+    [SerializeField]
+    // 무적시간동안 떨어지지 않도록 하는 발판 활성화용
+    private GameObject _safeZone;
 
     private void Awake() {
         Health = _maxHealth;
         Score = 0;
         _gameOverText.gameObject.SetActive(false);
+        _safeZone.SetActive(false);
     }
 
     private void Update() {
@@ -71,5 +76,12 @@ public class GameManager : MonoBehaviour
         Health -= energy;
 
         Debug.Log(Health);
+    }
+
+    public void ActivateSafeZone() {
+        _safeZone.SetActive(true);
+    }
+    public void DeactivateSafeZone() {
+        _safeZone.SetActive(false);
     }
 }
