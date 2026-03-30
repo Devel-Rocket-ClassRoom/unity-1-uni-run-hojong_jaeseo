@@ -10,7 +10,7 @@ public class Map : MonoBehaviour
 
     private void Update() {
         if (transform.position.x <= -Camera.ScreenWidth) {
-            Debug.Log($"{gameObject.name} : 스폰 요청");
+            // Debug.Log($"{gameObject.name} : 스폰 요청");
             OnDisapper?.Invoke();
             gameObject.SetActive(false);
         }

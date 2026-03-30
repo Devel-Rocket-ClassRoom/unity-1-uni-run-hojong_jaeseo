@@ -76,6 +76,7 @@ public class Player : MonoBehaviour
             if (Time.time - _lastHitTime < _noDamageDuration) { 
                 _renderer.enabled = !(_renderer.enabled);
             }
+
             // 시간 지나면 해제
             else if (_isNoDamageState) {
                 DeactivateHit();

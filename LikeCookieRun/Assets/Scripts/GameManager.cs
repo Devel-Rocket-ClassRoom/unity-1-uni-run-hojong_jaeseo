@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
         Score += score;
 
         _scoreText.text = $"{Score:N0}";
-        Debug.Log(Score);
+        // Debug.Log(Score);
     }
 
     public void AddHealth(float energy) {
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
 
         Health = Mathf.Min(Health, 100f);
 
-        Debug.Log(Health);
+        // Debug.Log(Health);
     }
 
     public void ReduceHealth(float energy) {
