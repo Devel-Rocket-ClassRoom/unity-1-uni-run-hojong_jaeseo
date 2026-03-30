@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
     private TextMeshProUGUI _scoreText;
     [SerializeField]
     private TextMeshProUGUI _gameOverText;
+
+    public event Action<float> OnChangeSpeed;
     
     [SerializeField]
     // 무적시간동안 떨어지지 않도록 하는 발판 활성화용

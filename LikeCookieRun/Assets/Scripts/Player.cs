@@ -7,7 +7,7 @@ public class Player : MonoBehaviour
     private PlayerColider _standingColider = new PlayerColider(new Vector2(-0.02230167f, -0.02230167f), new Vector2(0.8721762f, 1.4f));
 
     [SerializeField]
-    private float _jumpPower = 5f;
+    private float _jumpPower = 8.5f;
 
     private float _initialXLoc;
     private float _xRecoverSpeed = 3f;
@@ -26,8 +26,6 @@ public class Player : MonoBehaviour
     // 자석 아이템 관리
     [SerializeField]
     private GameObject _magnetArea;
-    private float _magnetStartTime = -10f;
-    private float _magnetDuration = 5f;
     private bool _isMagnetActive => _magnetArea.GetComponent<BoxCollider2D>().enabled;
 
     private Animator _animator;
@@ -82,11 +80,6 @@ public class Player : MonoBehaviour
                 DeactivateHit();
             }
 
-            // 자석 아이템 시간 종료되면 해제
-            if (Time.time > _magnetStartTime + _magnetDuration && _isMagnetActive) {
-                _magnetArea.GetComponent<BoxCollider2D>().enabled = false;
-            }
-
         } else if (!_isDead){
             _isDead = true;
             _animator.SetTrigger(PlayerAnimation.Dead);
@@ -102,7 +95,7 @@ public class Player : MonoBehaviour
         }
 
         // 맞았을 때
-        else if (collision.CompareTag(Tags.Hit) && Time.time >= _lastHitTime + _noDamageDuration) {
+        else if (!gameObject.CompareTag("Magnet") && collision.CompareTag(Tags.Hit) && Time.time >= _lastHitTime + _noDamageDuration) {
             Hit();
         }
     }
@@ -129,8 +122,7 @@ public class Player : MonoBehaviour
 
     // 자석 아이템 활성화
     public void ActivateMagnet() {
-        _magnetStartTime = Time.time;
-        _magnetArea.GetComponent<BoxCollider2D>().enabled = true;
+        _magnetArea.GetComponent<MagnetArea>().ActivateMagnet();
     }
 
     /// <summary>
